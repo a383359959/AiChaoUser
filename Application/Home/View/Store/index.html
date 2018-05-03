@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>{$store.store_name}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.lazyload.js"></script>
+	</head>
+	<body>
+		<header><i class="back"></i>{$store.store_name}</header>
+		<if condition="$store['is_close'] == 1">
+		<div class="is_close" style="z-index:99;background:#000;position:fixed;top:0px;left:0px;width:100%;height:100%;opacity:0.5;"></div>
+		<div class="is_close_text" style="position:fixed;z-index:100;font-size:20px;line-height:30px;width:100%;top:50%;margin-top:-15px;left:0px;text-align:center;color:#fff;">店 铺 休 息 中</div>
+		</if>
+		<script>
+		$(function(){
+			$('.store_item li').bind('click',function(){
+				var index = $(this).index();
+				$('.store_item li').removeClass('focus');
+				$(this).addClass('focus');
+				$('.store_content').hide();
+				$('.store_content').eq(index).show();
+			});
+		});
+		</script>
+		<div class="store_item"> 
+			<ul >
+				<li class="focus"><a href="javascript:;">商品</a></li>
+				<li><a href="javascript:;">店内详请</a></li>
+			</ul>
+		</div>
+		<div class="store_content">
+			<div class="store_content_category">
+				<ul>
+					<foreach name="category" item="value">
+					<li <if condition="$key == 0">class="focus"</if> ><a href="#c{$key}" key="{$key}">{$value.name}</a></li>
+					</foreach>
+				</ul>
+			</div>
+			<div class="store_content_list">
+				<foreach name="category" item="value">
+				<h1 class="c{$key}" id="c{$key}">{$value.name}</h1>
+				<ul>{:goodsList($value)}</ul>
+				</foreach>
+			</div>
+			<script>
+				$(function(){
+					$('.litpic').lazyload({
+						container: $('.store_content_list'),
+						threshold : 200,
+						effect: 'fadeIn'
+					});
+				});
+			</script>
+		</div>
+		<div class="store_content" style="display: none;">
+			<div class="store_content_desc">
+				<ul>
+					<li>
+						<span>地址：</span>
+						<span>{$store.address}</span>
+						<div class="clear"></div>
+					</li>
+					<li>
+						<span>电话：</span>
+						<a href="tel:{$store.store_phone}">{$store.store_phone}（点击拨打）</a>
+						<div class="clear"></div>
+					</li>
+					<li>
+						<span>简介：</span>
+						<span>{$store.desc}</span>
+						<div class="clear"></div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="store_footer">
+			<div class="cart"><i>{$cart}</i></div>
+			<a href="javascript:;" class="submit">去支付</a>
+		</div>
+		<div class="cart_list_bg"></div>
+		<div class="cart_list">
+			<h1>已选商品 <a href="javascript:;">清空</a></h1>
+			<ul></ul>
+		</div>
+		
+		<script type="text/javascript">
+		$(function(){
+			var store_id = {$Think.get.id};
+			var checkout = '{:U("checkout",array("store_id" => $_REQUEST["id"]))}';
+			$('.cart').bind('click',function(){
+				var num = $(this).find('i').text();
+				if(num < 1) return false;
+				var css = $('.cart_list').css('display');
+				if(css == 'none'){
+					$.ajax({
+						url : '{:U("loadCart")}',
+						data : {
+							store_id : store_id
+						},
+						dataType : 'json',
+						success : function(result){
+							$('.cart_list ul').html(result.html);
+							$('.cart_list_bg').show();
+							$('.cart_list').show();
+						}
+					});
+				}else{
+					$('.cart_list_bg').hide();
+					$('.cart_list').hide();
+				}
+			});
+			$('.cart_list h1 a').bind('click',function(){
+				$.ajax({
+					url : '{:U("clearCart")}',
+					data : {
+						store_id : store_id
+					},
+					dataType : 'json',
+					success : function(result){
+						$('.jian').hide();
+						$('.num').hide();
+						$('.cart_list_bg').hide();
+						$('.cart_list').hide();
+						$('.cart i').text(0);
+					}
+				});
+			});
+			$('.store_content_category li').bind('click',function(){
+				$('.store_content_category li').removeClass('focus');
+				$(this).addClass('focus');
+			});
+			$(document).on('click','.jia',function(){
+				var goods_id = $(this).attr('goods_id');
+				var obj = $(this);
+				$.ajax({
+					url : '{:U("updateCart")}',
+					data : {
+						type : 'jia',
+						store_id : store_id,
+						number : 1,
+						goods_id : goods_id,
+					},
+					dataType : 'json',
+					success : function(result){
+						if(result.status == 'success'){
+							obj.parent().find('.jian').show();
+							$('.num[goods_id="' + goods_id + '"]').text(result.number);
+							obj.parent().find('.num').text(result.number);
+							obj.parent().find('.num').show();
+							$('.cart_list_price[goods_id="' + goods_id + '"]').text('￥' + result.price);
+						}
+						$('.cart i').text(result.count);
+					}
+				});
+			});
+			$(document).on('click','.jian',function(){
+				var goods_id = $(this).attr('goods_id');
+				var obj = $(this);
+				$.ajax({
+					url : '{:U("updateCart")}',
+					data : {
+						type : 'jian',
+						store_id : store_id,
+						number : 1,
+						goods_id : goods_id
+					},
+					dataType : 'json',
+					success : function(result){
+						if(result.status == 'success'){
+							if(result.number < 1){
+								obj.parent().find('.num').hide();
+								obj.parent().find('.jian').hide();
+							}
+							if(result.number < 1){
+								$('.jian[goods_id="' + goods_id + '"]').hide();
+								$('.num[goods_id="' + goods_id + '"]').hide();
+								$('.cart_list li[goods_id="' + goods_id + '"]').remove();
+							}
+							$('.num[goods_id="' + goods_id + '"]').text(result.number);
+							$('.cart_list_price[goods_id="' + goods_id + '"]').text('￥' + result.price);
+							obj.parent().find('.num').text(result.number);
+							if(result.count < 1){
+								$('.cart_list_bg').hide();
+								$('.cart_list').hide();
+							}
+							$('.cart i').text(result.count);
+						}
+					}
+				});
+			});
+			$('.submit').bind('click',function(){
+				var cart = $('.cart i').text();
+				if(cart == 0){
+					alert('购物车不能为空');
+				}else{
+					$.ajax({
+						url : '{:U("loadCart")}',
+						data : {
+							store_id : store_id
+						},
+						dataType : 'json',
+						success : function(result){
+							var qisong = '{$store.price_qisong}';
+							qisong = Number(qisong);
+							<if condition="$store['jiajia'] GT 0">
+							var jiajia = qisong * {$store['jiajia']} / 100;
+							qisong += jiajia;
+							</if>
+							if(qisong > 0 && result.price < qisong){
+								alert('起送价' + qisong + '元！');
+							}else{
+								window.location.href = checkout;
+							}
+						}
+					});
+				}
+			});
+		});
+		</script>
+	</body>
+</html>

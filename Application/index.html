@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>{$school.name}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/topserach.css" />
+
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+<!--		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>-->
+		<script type="text/javascript">
+		$(function(){
+			var school_id = '{$school.id}';
+			var page = 0;			
+			loadData(0);
+			function loadData(category_id){
+				$('.index_list ul').html('');
+				$('.dropload-down').remove();
+				$('.index_list').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("index_list")}',
+							data : {
+								school_id : school_id,
+								page : page,
+								category_id : category_id
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.index_list ul').append(list);
+								}else{
+									me.lock();
+									me.noData();
+								}
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+		});
+		</script>
+	</head>
+	<body>
+           <header><a href="{:U('school',array('action' => 'select'))}" style="color:#fff;">{$school.name}</a> </header>
+		<div class="swiper-container">
+		    <div class="swiper-wrapper">
+				<foreach name="banner" item="value">
+		        <div class="swiper-slide"><img src="{$value.imgurl}" /></div>
+				</foreach>
+		    </div>
+		</div>
+		<script type="text/javascript">
+			$(function(){
+			  	var mySwiper = new Swiper ('.swiper-container', {
+			    	autoplay : 5000,
+			    	loop: true,
+			  	});
+			});
+		</script>
+		<div class="index_item">
+			<ul>
+				<li>
+					<a href="{:U('Supermarket/index')}">
+						<img src="__PUBLIC__/Home/images/ico1.png" />
+						<p>商超</p>
+					</a>
+				</li>
+				<li>
+					<a href="{:U('canyin')}">
+						<img src="__PUBLIC__/Home/images/ico2.png" />
+						<p>餐饮</p>
+					</a>
+				</li>
+				<li>
+					<img src="__PUBLIC__/Home/images/ico3.png" />
+					<p>洗衣</p>
+				</li>
+				<li>
+					<img src="__PUBLIC__/Home/images/ico4.png" />
+					<p>同学的店</p>
+				</li>
+				<li>
+					<img src="__PUBLIC__/Home/images/ico5.png" />
+					<p>代取快

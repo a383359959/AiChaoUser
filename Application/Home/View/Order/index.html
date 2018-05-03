@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>我的订单</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var page = 0;
+			loadData();
+			$('.order_list_item li').bind('click',function(){
+				$('.order_list_item li').removeClass('active');
+				$(this).addClass('active');
+				page = 0;
+				loadData();
+			});
+			function loadData(){
+				var index = $('.order_list_item li').index($('.order_list_item li.active'));
+				$('.order_list_main ul').html('');
+				$('.dropload-down').remove();
+				$('.order_list_main').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("getOrderList")}',
+							data : {
+								index : index,
+								page : page
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.order_list_main ul').append(list);
+								}else{
+									me.lock();
+                                    me.noData();
+								}
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+			$(document).on('click','.order_cancel',function(){
+				var msg = confirm('确定取消？');
+				if(msg){
+					$.ajax({
+						url : '{:U("changeStatus")}',
+						data : {
+							id : $(this).attr('data_id'),
+							status : 3
+						},
+						dataType : 'json',
+						success : function(result){
+							if(result.status == 'success') window.location.href = window.location.href;
+						}
+					});
+				}
+			});
+			$(document).on('click','.order_success',function(){
+				$.ajax({
+					url : '{:U("changeStatus")}',
+					data : {
+						id : $(this).attr('data_id'),
+						status : 8
+					},
+					dataType : 'json',
+					success : function(result){
+						if(result.status == 'success') window.location.href = window.location.href;
+					}
+				});
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<header><i class="back"></i>我的订单</header>
+		<div class="order_list">
+			<div class="order_list_item">
+				<ul>
+					<li class="active"><a href="javascript:;">全部</a></li>
+					<li><a href="javascript:;">待付款</a></li>
+					<li><a href="javascript:;">待抢单</a></li>
+					<li><a href="javascript:;">配送中</a></li>
+					<li><a href="javascript:;">已完成</a></li>
+					<li><a href="javascript:;">待评价</a></li>
+					<div class="clear"></div>
+				</ul>
+			</div>
+			<div class="order_list_main">
+				<ul></ul>
+				<script id="list" type="text/html">
+					{{each list as value key}}
+					<li>
+						<div class="order_list_main_header">
+							<p>{{value.add_time}}</p>
+							<p>
+								{{if value.pay_status == 0}}
+									<span style="color:#f8d101;">未付款</span>
+								{{else if value.status == 0}}
+									<span style="color:red;">等待商家确认</span>
+								{{else if value.status == 2}}
+									<span style="color:red;">商家取消订单</span>
+								{{else if value.status == 1 || value.status == 4 || value.status == 5}}
+									<span style="color:#f8d101;">抢单中</span>
+								{{else if value.status == 6}}
+									<span style="color:#f8d101;">配送中</span>
+								{{else if value.status == 7}}
+									<span style="color:#f8d101;">骑手确定送达</span>
+								{{else if value.status == 8}}
+									<span style="color:#f8d101;">待评价</span>
+								{{else if value.status == 9}}
+									<span style="color:#f8d101;">已完成</span>
+								{{else if value.status == 3}}
+									<span style="color:red;">用户取消订单</span>
+								{{/if}}
+							</p>
+							<div class="clear"></div>
+						</div>
+						<div class="order_list_main_store">
+							<a href="{{value.order_url}}">
+								{{if value.logo == ''}}
+								<img src="__PUBLIC__/Home/images/store_logo_null.png" />
+								{{else}}
+								<img src="__PUBLIC__/Home/images/store_logo_null.png" data-original="http://static.upload.smdouyou.com/{{value.logo}}" class="lazy" />
+								{{/if}}
+								<p>{{value.store_name}}</p>
+							</a>
+						</div>
+						<div class="order_list_main_btn">
+							{{if value.pay_status == 0}}
+								<a href="{{value.order_url}}">付款</a>
+							{{else if value.status == 0}}
+								<a href="javascript:;" class="order_cancel" data_id="{{value.id}}">取消订单</a>
+							{{else if value.status == 2}}
+								<a href="{{value.store_url}}">再来一单</a>
+							{{else if value.status == 1 || value.status == 4 || value.status == 5}}
+								<a href="{{value.store_url}}">再来一单</a>
+							{{else if value.status == 6}}
+								<a href="{{value.store_url}}">再来一单</a>
+							{{else if value.status == 7}}
+								<a href="/index.php/Home/Order/tousu/order_id/{{value.id}}.html" style="border-color:red;color:red;">投诉</a>
+								<a href="javascript:;" class="order_success" data_id="{{value.id}}">确认收货</a>
+							{{else if value.status == 8}}
+								<a href="/index.php/Home/Order/tousu/order_id/{{value.id}}.html" style="border-color:red;color:red;">投诉</a>
+								<a href="{{value.msg_url}}">评价</a>
+							{{else if value.status == 9}}
+								<a href="/index.php/Home/Order/tousu/order_id/{{value.id}}.html" style="border-color:red;color:red;">投诉</a>
+								<a href="{{value.store_url}}">再来一单</a>
+							{{else if value.status == 3}}
+								<a href="{{value.store_url}}">再来一单</a>
+							{{/if}}
+							<div class="clear"></div>
+						</div>
+					</li>
+					{{/each}}
+				</script>
+			</div>
+		</div>
+		<include file="Common:footer" />
+	</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>{$school.name}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/topserach.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.lazyload.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var school_id = '{$school.id}';
+			var page = 0;
+			loadData(0);
+			function loadData(category_id){
+				$('.index_list ul').html('');
+				$('.dropload-down').remove();
+				$('.index_list').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("index_list")}',
+							data : {
+								school_id : school_id,
+								page : page,
+								category_id : category_id
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.index_list ul').append(list);
+									$('img.lazy').lazyload({effect: 'fadeIn'});
+								}else{
+									me.lock();
+									me.noData();
+								}
+								
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+		});
+		</script>
+	</head>
+	<body>
+		<header><a href="{:U('school',array('action' => 'select'))}" style="color:#fff;">{$school.name}</a></header>
+		<div class="swiper-container">
+		    <div class="swiper-wrapper" id="topimage">
+				<foreach name="banner" item="value">
+		        <div class="swiper-slide"  style="display:block"><img src="http://static.upload.smdouyou.com/{$value.imgurl}" /></div>
+				</foreach>
+		    </div>
+		</div>
+		<script type="text/javascript">
+			$(function(){
+			  	var mySwiper = new Swiper ('.swiper-container', {
+			    	autoplay : 5000,
+			    	loop: true,
+			  	});
+			});
+        </script>
+        <div class="index_item">
+			<ul>
+				<li>
+					<a href="{:U('Store/index',array('id' => $supermarket['id']))}">
+						<img src="__PUBLIC__/Home/images/ico1.png" />
+						<p>商超</p>
+					</a>
+				</li>
+				<li>
+					<a href="{:U('canyin')}">
+						<img src="__PUBLIC__/Home/images/ico2.png" />
+						<p>餐饮</p>
+					</a>
+				</li>
+				<li>
+					<!-- <a href="{:U('xiyi')}"> -->
+						<img src="__PUBLIC__/Home/images/ico3.png" />
+						<p>洗衣</p>
+					<!-- </a> -->
+				</li>
+				<!--
+				<li>
+					<img src="__PUBLIC__/Home/images/ico4.png" />
+					<p>同学的店</p>
+				</li>
+				-->
+				<li>
+					<!-- <a href="{:U('daiqu')}"> -->
+						<img src="__PUBLIC__/Home/images/ico5.png" />
+						<p>代取快递</p>
+					<!-- </a> -->
+                </li>
+				<!--
+				<li>
+					<a href="{:U('youhui',array('type' => 1))}">
+						<img src="__PUBLIC__/Home/images/ico2.png" />
+						<p>天天特价</p>
+					</a>
+				</li>
+				<li>
+					<a href="{:U('youhui',array('type' => 4))}">
+						<img src="__PUBLIC__/Home/images/ico2.png" />
+						<p>第二杯半价</p>
+					</a>
+				</li>
+				<li>
+					<a href="">
+						<img src="__PUBLIC__/Home/images/ico2.png" />
+						<p>限时抢购</p>
+					</a>
+				</li>
+				<li>
+					<a href="{:U('youhui',array('type' => 3))}">
+						<img src="__PUBLIC__/Home/images/ico2.png" />
+						<p>买一送一</p>
+					</a>
+				</li>-->
+				<div class="clear"></div>
+            </ul>
+        </div>
+		<div class="youhui">
+			<ul>
+				<li><a href="{:U('youhui',array('type' => 1))}"><img src="__PUBLIC__/Home/images/index_ico4.png" /></a></li>
+				<li><a href="{:U('youhui',array('type' => 4))}"><img src="__PUBLIC__/Home/images/index_ico1.png" /></a></li>
+				<li><a href="{:U('youhui',array('type' => 2))}"><img src="__PUBLIC__/Home/images/index_ico2.png" /></a></li>
+				<li><a href="{:U('youhui',array('type' => 3))}"><img src="__PUBLIC__/Home/images/index_ico3.png" /></a></li>
+			</ul>
+		</div>
+		<div class="index_list">
+			<h1>商家列表</h1>
+			<ul></ul>
+			<script id="list" type="text/html">
+			{{each list as value key}}
+			<li>
+				<a href="{{value.url}}">
+					{{if value.logo == ''}}
+					<img src="__PUBLIC__/Home/images/store_logo_null.png" />
+					{{else}}
+					<img src="__PUBLIC__/Home/images/store_logo_null.png" data-original="http://static.upload.smdouyou.com/{{value.logo}}" class="lazy" />
+					{{/if}}
+					<div class="index_list_content">
+						<h1>{{value.store_name}}</h1>
+						{{if value.is_pei_type == 1}}<p>支持&nbsp;<font style="color:#f8d101;">爱超配送，送货上床</font></p>{{/if}}
+						<p>销售&nbsp;{{value.sale}}&nbsp;单</p>
+						<p>起送&nbsp;{{value.price_qisong}}&nbsp;元&nbsp;|&nbsp;打赏&nbsp;{{value.dashang_price}}&nbsp;元</p>
+						<span>地址：{{value.address}}</span>
+						<div class="index_list_activity">
+							<div class="activity_box">{{#value.activity}}</div>
+					</div>
+				</a>
+				{{if value.ranking_status == 1 && value.price > 0 && value.ranking > 0 && value.ranking_price <= value.ranking_budget}}<div class="seo">推广</div>{{/if}}
+				{{if value.is_close == 0}}<div class="isclose">营业中</div>{{else}}<div class="isclose c">休息中</div>{{/if}}
+			</li>
+			{{/each}}
+			</script>
+		</div>
+		<include file="Common:footer" />
+	</body>
+</html>

@@ -1,0 +1,80 @@
+  .search{
+	float:left;
+	height:26;
+	padding-left:20px;
+	
+}
+
+ #touming{
+	font-size:11px;
+	width:288px;
+	background-color:transparent;
+	border:none;
+	background:#fff;
+	padding:5px;
+        padding-left:10px;
+	border-radius:2px;
+}
+ .search_form{position:relative;}
+
+#search_submit{
+	
+	width:37px;
+	height:37px;
+	line-height:37px;
+	background:url(../images/searchicon.png) no-repeat right center;
+	border:none;
+	position:absolute;  
+	top:4px;
+	right:20px;
+}
+#search_submit2{
+	
+	width:37px;
+	height:37px;
+	line-height:37px;
+	background:url(../images/searchicon.png) no-repeat right center;
+	border:none;
+	position:absolute;  
+	top:4px;
+	right:5px;
+}
+
+.cancel{
+	width:40px;
+	position:absolute;  
+	top:3px;
+	right:20px;
+}
+.hotserach{
+	margin:5px;
+	margin-top:60px;
+}
+#hotserach{
+	height:200px;
+}
+.hisserach{
+	margin:5px;
+}
+	.delall{
+	
+	background-color:transparent;
+		height:30px;
+	position:absolute;
+	bottom:30px; 
+	left:30%;
+
+
+}
+ #delhis>button {
+	   
+	    font-family: tahoma,'\5FAE\8F6F\96C5\9ED1';
+            width: 180px;
+            height: 35px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background: #f6f5e7;
+        }
+
+
+ .search #search_submit:hover{cursor:pointer}

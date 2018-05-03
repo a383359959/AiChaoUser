@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title><if condition="$_REQUEST['type'] == 1">满减活动</if><if condition="$_REQUEST['type'] == 2">第二份半价</if><if condition="$_REQUEST['type'] == 3">买一送一</if><if condition="$_REQUEST['type'] == 4">限时抢购</if></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.lazyload.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var school_id = '{$school.id}';
+			var page = 0;		
+			loadData(0);
+			function loadData(category_id){
+				$('.index_list ul').html('');
+				$('.dropload-down').remove();
+				$('.index_list').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("youhui_list")}',
+							data : {
+								type : '{$Think.get.type}',
+								school_id : school_id,
+								page : page,
+								category_id : category_id
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.index_list ul').append(list);
+									$('img.lazy').lazyload({effect: 'fadeIn'});
+								}else{
+									me.lock();
+									me.noData();
+								}
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+		});
+		</script>
+	</head>
+	<body>
+		<header><i class="back"></i><if condition="$_REQUEST['type'] == 1">满减活动</if><if condition="$_REQUEST['type'] == 2">第二份半价</if><if condition="$_REQUEST['type'] == 3">买一送一</if><if condition="$_REQUEST['type'] == 4">限时抢购</if></header>
+		<div class="index_list" style="margin-top:45px;">
+			<h1>商家列表</h1>
+			<ul></ul>
+			<script id="list" type="text/html">
+				{{each list as value key}}
+				<li>
+					<a href="{{value.url}}">
+						{{if value.logo == ''}}
+						<img src="__PUBLIC__/Home/images/store_logo_null.png" />
+						{{else}}
+						<img src="__PUBLIC__/Home/images/store_logo_null.png" data-original="http://static.upload.smdouyou.com/{{value.logo}}" class="lazy" />
+						{{/if}}
+						<div class="index_list_content">
+							<h1>{{value.store_name}}</h1>
+							{{if value.is_pei_type == 1}}<p>支持&nbsp;<font style="color:#f8d101;">爱超配送，送货上床</font></p>{{/if}}
+							<p>销售&nbsp;{{value.sale}}&nbsp;单</p>
+							<p>起送&nbsp;{{value.price_qisong}}&nbsp;元&nbsp;|&nbsp;打赏&nbsp;{{value.dashang_price}}&nbsp;元</p>
+							<span>地址：{{value.address}}</span>
+							<div class="index_list_activity">
+								<div class="activity_box">{{#value.activity}}</div>
+						</div>
+					</a>
+					{{if value.ranking_status == 1 && value.price > 0 && value.ranking > 0 && value.ranking_price <= value.ranking_budget}}<div class="seo">推广</div>{{/if}}
+					{{if value.is_close == 0}}<div class="isclose">营业中</div>{{else}}<div class="isclose c">休息中</div>{{/if}}
+				</li>
+				{{/each}}
+				</script>
+		</div>
+		<include file="Common:footer" />
+	</body>
+</html>

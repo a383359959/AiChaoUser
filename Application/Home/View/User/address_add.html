@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>新增收货地址</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			$('form').submit(function(){
+				var name = $('input[name="name"]').val();
+				var telephone = $('input[name="telephone"]').val();
+				var school_address_id = $('select[name="school_address_id"]').val();
+				var address = $('input[name="address"]').val();
+				if(name == ''){
+					alert('姓名不能为空！');
+					return false;
+				}else if(school_address_id == 0){
+					alert('请选择楼！');
+					return false;
+				}else if(telephone == ''){
+					alert('电话不能为空！');
+					return false;
+				}else if(telephone.length != 11){
+					alert('电话格式错误！');
+					return false;
+				}else if(address == ''){
+					alert('地址不能为空！');
+					return false;
+				}
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<header><i class="back"></i>新增收货地址</header>
+		<div class="address_add">
+			<form action="" method="post">
+			<input type="hidden" name="form_submit" value="ok" />
+			<input type="hidden" name="act" value="{$Think.get.act}" />
+			<input type="hidden" name="store_id" value="{$Think.get.store_id}" />
+			<input type="hidden" name="status" value="{$Think.get.status}" />
+			<input type="hidden" name="is_new" value="{$Think.get.is_new}" />
+			<ul>
+				<li>
+					<label>姓名：</label>
+					<input type="text" placeholder="请输入姓名" name="name" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>电话：</label>
+					<input type="tel" placeholder="请输入电话" name="telephone" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>选择楼：</label>
+					<select name="school_address_id">
+						<option value="0">请选择</option>
+						<volist name="school_address" id="value">
+						<option value="{$value.id}">{$value.name}</option>
+						</volist>
+					</select>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>地址：</label>
+					<input type="text" placeholder="请输入地址" name="address" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<input type="submit" value="保存" />
+					<div class="clear"></div>
+				</li>
+			</ul>
+			</form>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,18 @@
+[ 2018-03-21T16:03:46+08:00 ] 111.30.142.78 /index.php/Store/Login/index.html
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+ERR: 无法加载模块:Store
+
+[ 2018-03-21T16:03:55+08:00 ] 111.30.142.233 /index.php/Store/Login/index.html
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+ERR: 无法加载模块:Store
+
+[ 2018-03-21T16:04:45+08:00 ] 101.226.225.84 /index.php/Store/Login/index.html
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000976s ]
+ERR: 无法加载模块:Store
+

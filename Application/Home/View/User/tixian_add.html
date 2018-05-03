@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>提现申请</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var user_id = {$user.id};
+			var money = Number('{$user.money}');
+			$('form').submit(function(){
+				var price = $('input[name="price"]').val();
+				var alipay_accounts = $('input[name="alipay_accounts"]').val();
+				var alipay_name = $('input[name="alipay_name"]').val();
+				if(price > money){
+					alert('账户可用余额不足');
+					return false;
+				}else if(price == ''){
+					alert('请填写提现金额');
+					return false;
+				}else if(alipay_accounts == ''){
+					alert('请填写支付宝帐号');
+					return false;
+				}else if(alipay_name == ''){
+					alert('请填写支付宝姓名');
+					return false;
+				}else{
+					var msg = confirm('确保填写信息无误？');
+					if(!msg) return false;
+				}
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<header><i class="back"></i>提现申请</header>
+		<div class="address_add">
+			<form action="" method="post">
+			<input type="hidden" name="form_submit" value="ok" />
+			<ul>
+				<li>
+					<label>可用金额：</label>
+					<input type="text" placeholder="请输入金额" value="{$user.money}" disabled />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>提现金额：</label>
+					<input type="text" placeholder="请输入金额" name="price" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>帐号：</label>
+					<input type="text" placeholder="请输入支付宝帐号" name="alipay_accounts" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>姓名：</label>
+					<input type="text" placeholder="请输入支付宝姓名" name="alipay_name" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<input type="submit" value="保存" />
+					<div class="clear"></div>
+				</li>
+			</ul>
+			</form>
+		</div>
+	</body>
+</html>

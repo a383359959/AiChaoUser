@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>我的地址</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<style>
+		.user_address a{
+			color:#333;
+		}
+		</style>
+	</head>
+	<body>
+		<header><i class="back"></i>我的地址<i class="add"><a href="{:U('address_add',array('status' => $_REQUEST['status'],'store_id' => $_REQUEST['store_id']))}">添加收货地址</a></i></header>
+		<div class="user_address">
+			<ul>
+				<foreach name="list" item="value">
+				<li>
+					<if condition="$_REQUEST['status'] == 'select'"><a href="/index.php/Home/Store/checkout/store_id/{$Think.get.store_id}.html?address_id={$value.id}"></if>
+					<div class="user_address_info">
+						<p>{$value.name}</p>
+						<p>{$value.telephone}</p>
+						<div class="clear"></div>
+					</div>
+					<div class="user_address_main">{$value.address}</div>
+					<if condition="$_REQUEST['status'] == 'select'"></a></if>
+					<div class="user_address_action">
+						<a href="{:U('address_edit',array('status' => $_REQUEST['status'],'store_id' => $_REQUEST['store_id'],'id' => $value['id']))}" class="edit">编辑</a>
+						<a href="{:U('address_del',array('id' => $value['id']))}" class="del">删除</a>
+						<div class="clear"></div>
+					</div>
+				</li>
+				</foreach>
+			</ul>
+		</div>
+	</body>
+</html>

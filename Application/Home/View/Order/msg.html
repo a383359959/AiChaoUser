@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>评价</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var peisong_id = '{$order["peisong_id"]}';
+			$('.checkout_submit').bind('click',function(){
+				$('form').submit();
+			});
+			$('form').submit(function(){
+				var store_level = $('select[name="store_level"]').val();
+				var store_content = $('textarea[name="store_content"]').val();
+				var peisong_level = $('select[name="peisong_level"]').val();
+				var peisong_content = $('textarea[name="peisong_content"]').val();
+				var goods_level = $('select[name="goods_level"]').val();
+				var goods_content = $('textarea[name="goods_content"]').val();
+				<if condition="$order['type'] == 3 || $order['type'] == 4">
+					goods_level = 1;
+					goods_content = '1';
+					$('select[name="goods_level[]"]').each(function(){
+						if($(this).val() == 0) goods_level = 0;
+					});
+					$('textarea[name="goods_content[]"]').each(function(){
+						if($(this).val() == '') goods_content = '';
+					});
+				</if>
+				if(store_level == 0){
+					alert('请选择店铺星级！');
+					return false;
+				}else if(store_content == ''){
+					alert('请评价店铺！');
+					return false;
+				}else if(peisong_level == 0){
+					alert('请选择配送员星级！');
+					return false;
+				}else if(peisong_content == ''){
+					alert('请评价配送员！');
+					return false;
+				}else if(goods_level == 0){
+					alert('请选择商品星级！');
+					return false;
+				}else if(goods_content == ''){
+					alert('请评价商品！');
+					return false;
+				}
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<header><i class="back"></i>评价</header>
+		<div class="pingjia">
+			<form action="" method="post">
+			<input type="hidden" name="form_submit" value="ok" />
+			<input type="hidden" name="store_id" value="{$order.store_id}" />
+			<input type="hidden" name="order_id" value="{$order.id}" />
+			<input type="hidden" name="peisong_id" value="{$order.peisong_id}" />
+			<ul>
+				<li>
+					<h1>评价{$order.store_name}</h1>
+					<label>星级</label>
+					<select name="store_level">
+						<option value="0">请选择</option>
+						<for start="1" end="6">
+						<option value="{$i}">{$i}&nbsp;星</option>
+						</for>
+					</select>
+					<textarea placeholder="请评价{$order.store_name}" name="store_content"></textarea>
+				</li>
+				<li>
+					<h1>评价配送员</h1>
+					<label>星级</label>
+					<select name="peisong_level">
+						<option value="0">请选择</option>
+						<for start="1" end="6">
+						<option value="{$i}">{$i}&nbsp;星</option>
+						</for>
+					</select>
+					<textarea placeholder="评价配送员" name="peisong_content"></textarea>
+				</li>
+				<if condition="$order['type'] == 1">
+				<input type="hidden" name="goods_id" value="{$order.goods_id}" />
+				<li>
+					<h1>评价{$order.title}</h1>
+					<label>星级</label>
+					<select name="goods_level">
+						<option value="0">请选择</option>
+						<for start="1" end="6">
+						<option value="{$i}">{$i}&nbsp;星</option>
+						</for>
+					</select>
+					<textarea placeholder="评价{$order.title}" name="goods_content"></textarea>
+				</li>
+				<elseif condition="$order['type'] == 2" />
+				<input type="hidden" name="goods_id" value="{$order.goods_id}" />
+				<li>
+					<h1>评价<if condition="$order['goods_id'] == 1">取快递<else />发快递</if>服务</h1>
+					<label>星级</label>
+					<select name="goods_level">
+						<option value="0">请选择</option>
+						<for start="1" end="6">
+						<option value="{$i}">{$i}&nbsp;星</option>
+						</for>
+					</select>
+					<textarea placeholder="评价<if condition="$order['goods_id'] == 1">取快递<else />发快递</if>服务" name="goods_content"></textarea>
+				</li>
+				<else />
+				<volist name="goods" id="value">
+				<input type="hidden" name="goods_id[]" value="{$value.goods_id}" />
+				<li>
+					<h1>评价{$value.goods_name}</h1>
+					<label>星级</label>
+					<select name="goods_level[]">
+						<option value="0">请选择</option>
+						<for start="1" end="6">
+						<option value="{$i}">{$i}&nbsp;星</option>
+						</for>
+					</select>
+					<textarea placeholder="评价{$value.goods_name}" name="goods_content[]"></textarea>
+				</li>
+				</volist>
+				</if>
+			</ul>
+			</form>
+		</div>
+		<a href="javascript:;" class="checkout_submit" style="margin-top:0px;">提交</a>
+	</body>
+</html>

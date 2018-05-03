@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>餐饮</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var school_id = '{$school.id}';
+			var page = 0;		
+			loadData(0);
+			$('.fenlei').bind('click',function(){
+				$('.fenlei_main').show();
+				$('.fenlei_bg').show();
+			});
+			$('.fenlei_main li').bind('click',function(){
+				var id = $(this).attr('data_id');
+				page = 0;
+				loadData(id);
+				$('.fenlei_main li').removeClass('focus');
+				$(this).addClass('focus');
+				$('.fenlei_main').hide();
+				$('.fenlei_bg').hide();
+			});
+			function loadData(category_id){
+				$('.index_list ul').html('');
+				$('.dropload-down').remove();
+				$('.index_list').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("index_list")}',
+							data : {
+								school_id : school_id,
+								page : page,
+								category_id : category_id
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.index_list ul').append(list);
+								}else{
+									me.lock();
+									me.noData();
+								}
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+		});
+		</script>
+		<style>
+			.fenlei{
+				width: 21px;
+				height: 21px;
+				display: block;
+				position: absolute;
+				right: 10px;
+				top: 12px;
+			}
+			.fenlei img{
+				width:100%;
+				height:100%;
+				display:block;
+			}
+			.fenlei_bg{
+				background:#000;
+				opacity:0.5;
+				position:fixed;
+				top:45px;
+				left:0px;
+				width:100%;
+				height:100%;
+				z-index:100;
+				display:none;
+			}
+			.fenlei_main{
+				background:#fff;
+				position:fixed;
+				top:45px;
+				left:0px;
+				width:100%;
+				z-index:101;
+				display:none;
+			}
+			.fenlei_main h1{
+				background:#fafafa;
+				font-size:16px;
+				color:#666;
+				border-bottom:solid 1px #eee;
+				padding:10px;
+			}
+			.fenlei_main li a{
+				display:block;
+				color:#333;
+				padding:10px;
+				border-bottom:solid 1px #eee;
+			}
+			.fenlei_main li.focus a{
+				color:#f8d101;
+			}
+		</style>
+	</head>
+	<body>
+		<header><i class="back"></i>餐饮<i class="fenlei"><img src="__PUBLIC__/Home/images/fenlei.png" /></i></header>
+		<div class="fenlei_bg"></div>
+		<div class="fenlei_main">
+			<h1>分类</h1>
+			<ul>
+				<li class="focus" data_id="0"><a href="javascript:;">全部</a></li>
+				<foreach name="category" item="value">
+				<li data_id="{$value.id}"><a href="javascript:;">{$value.name}</a></li>
+				</foreach>
+				<div class="clear"></div>
+			</ul>
+		</div>
+		<!--
+		<div class="index_shaixuan">
+			<h1>筛选</h1>
+			<ul>
+				<li class="focus" data_id="0"><a href="javascript:;">全部</a></li>
+				<foreach name="category" item="value">
+				<li data_id="{$value.id}"><a href="javascript:;">{$value.name}</a></li>
+				</foreach>
+				<div class="clear"></div>
+			</ul>
+		</div>-->
+		<div class="index_list" style="margin-top:0px;">
+			<h1>商家列表</h1>
+			<ul></ul>
+			<script id="list" type="text/html">
+			{{each list as value key}}
+			<li>
+				<a href="{{value.url}}">
+					{{if value.is_activity == 1}}<div class="hd">活动</div>{{/if}}
+					<img src="{{value.logo}}" {{if value.is_pei_type == 1}}style="margin-bottom:20px;display:block;"{{/if}} />
+					<div class="index_list_content">
+						<h1>{{value.store_name}}</h1>
+						{{if value.is_pei_type == 1}}<p>支持&nbsp;<font style="color:#f8d101;">爱超配送，送货上床</font></p>{{/if}}
+						<p>销售&nbsp;{{value.sale}}&nbsp;单</p>
+						<p>配送&nbsp;{{value.pei_price}}&nbsp;元&nbsp;|&nbsp;起送&nbsp;{{value.price_qisong}}&nbsp;元&nbsp;|&nbsp;打赏&nbsp;{{value.dashang_price}}&nbsp;元</p>
+						<span>地址：{{value.address}}</span>
+					</div>
+				</a>
+				{{if value.ranking > 0}}<div class="seo">推广</div>{{/if}}
+				{{if value.is_close == 0}}<div class="isclose">营业中</div>{{else}}<div class="isclose c">休息中</div>{{/if}}
+			</li>
+			{{/each}}
+			</script>
+		</div>
+		<include file="Common:footer" />
+	</body>
+</html>

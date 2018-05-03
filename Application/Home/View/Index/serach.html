@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>{$school.name}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/topserach.css" />
+
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var school_id = '{$school.id}';
+			var page = 0;			
+			loadData(0);
+			function loadData(category_id){
+				$('.index_list ul').html('');
+				$('.dropload-down').remove();
+				$('.index_list').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("index_list")}',
+							data : {
+								school_id : school_id,
+								page : page,
+								category_id : category_id
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.index_list ul').append(list);
+								}else{
+									me.lock();
+									me.noData();
+								}
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+		});
+           
+		</script>
+	</head>
+	<body>
+           <header><a href="{:U('school',array('action' => 'select'))}" style="color:#fff;">{$school.name}</a>
+            <div class="search">
+        	<div class="search_form">
+                <form method="post" action="" name="frm1">
+                    <input type="search" placeholder="请输入搜索内容" id="touming"/>
+                    <button type="submit" id="search_submit2" onclick="jump()"></button>
+                </form>
+            </div>
+           
+        <div class="cancel"  id='off'><a href="{:U('index')}" style="color:#fff;">取消</a></div>
+        </header>
+		
+		<script type="text/javascript">
+			$(function(){
+			  	var mySwiper = new Swiper ('.swiper-container', {
+			    	autoplay : 5000,
+			    	loop: true,
+			  	});
+			});
+                       
+           
+         
+        </script>
+                <div class="hotserach" style="display:block" id="hot">
+                    <span class="hotserach">
+                        <strong>热搜</strong>
+                    </span>
+                    <div id='hotserach'></div>
+                    <span class='hisserach'>
+                        <strong>最近搜索</strong>
+                    </span>
+               </div>
+                    <div class="delall" id="delhis" style="display:block">
+                      <button type="submit" id="delhistory">清除所有搜索记录
+                        
+                    </div>
+                    

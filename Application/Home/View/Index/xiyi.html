@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>洗衣</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=b22ce3edc747426f486b6004021c50be"></script>
+		<script type="text/javascript">
+		$(function(){
+			var map, geolocation;
+			var lng = '';
+			var lat = '';
+			map = new AMap.Map('map',{
+				resizeEnable: true
+			});
+			map.plugin('AMap.Geolocation', function() {
+				geolocation = new AMap.Geolocation({
+					enableHighAccuracy : true,
+					timeout : 10000,
+					buttonOffset : new AMap.Pixel(10, 20),
+					zoomToAccuracy : true,
+					buttonPosition :'RB'
+				});
+				geolocation.getCurrentPosition();
+				AMap.event.addListener(geolocation,'complete',function(data){
+					lng = data.position.getLng();
+					lat = data.position.getLat();
+				});
+				AMap.event.addListener(geolocation,'error',onError);
+			});
+			$('.checkout_submit').bind('click',function(){
+				if(lng == '' || lat == ''){
+					alert('定位中，请稍后再试');
+					return false;
+				}
+				var xiyitype_id = $('select[name="xiyitype_id"]').val();
+				var school_address_id = $('select[name="school_address_id"]').val();
+				var consignee_name = $('input[name="consignee_name"]').val();
+				var consignee_telephone = $('input[name="consignee_telephone"]').val();
+				var consignee_address = $('input[name="consignee_address"]').val();
+				if(xiyitype_id == 0){
+					alert('请选择洗衣类型！');
+				}else if(consignee_name == ''){
+					alert('收货人姓名不能为空！');
+				}else if(consignee_telephone == ''){
+					alert('收货人电话不能为空！');
+				}else if(consignee_telephone.length != 11){
+					alert('收货人电话格式不正确！');
+				}else if(school_address_id == 0 || consignee_address == ''){
+					alert('请完善收货地址！');
+				}else{
+					$.ajax({
+						url : '{:U("setXiYi")}',
+						data : {
+							xiyitype_id : xiyitype_id,
+							school_address_id : school_address_id,
+							consignee_name : consignee_name,
+							consignee_telephone : consignee_telephone,
+							consignee_address : consignee_address,
+							lng : lng,
+							lat : lat
+						},
+						dataType : 'json',
+						success : function(result){
+							WeixinJSBridge.invoke('getBrandWCPayRequest',result,function(res){
+								window.location.href = '{:U("Order/index")}';
+							});
+						}
+					});
+				}
+			});
+			$('select[name="xiyitype_id"]').bind('change',function(){
+				var value = $(this).val();
+				$.ajax({
+					url : '{:U("getXiYiPrice")}',
+					data : {
+						value : value
+					},
+					dataType : 'json',
+					success : function(result){
+						$('.price').html('￥&nbsp;' + result.price);
+					}
+				});
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<div id="map" style="display:none;"></div>
+		<header><i class="back"></i>洗衣</header>
+		<div class="xiyi">
+			<ul>
+				<li>
+					<label>洗衣类型</label>
+					<select name="xiyitype_id">
+						<option value="0">请选择</option>
+						<volist name="xiyitype" id="value">
+						<option value="{$value.id}">{$value.name}</option>
+						</volist>
+					</select>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>收货人姓名</label>
+					<input type="text" name="consignee_name" placeholder="请输入收货人姓名" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>收货人电话</label>
+					<input type="tel" name="consignee_telephone" placeholder="请输入收货人电话" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>收货地址</label>
+					<input type="text" disabled value="{$school.name}" />
+					<div class="clear"></div>
+					<div class="xiyi_address">
+						<select name="school_address_id">
+							<option value="0">请选择</option>
+							<volist name="school_address" id="value">
+							<option value="{$value.id}">{$value.name}</option>
+							</volist>
+						</select>
+						<input type="text" name="consignee_address" placeholder="请输入详细地址" />
+						<div class="clear"></div>
+					</div>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>总金额</label>
+					<p class="price">￥&nbsp;0.00</p>
+					<div class="clear"></div>
+				</li>
+			</ul>
+			<a href="javascript:;" class="checkout_submit">支付</a>
+		</div>
+	</body>
+</html>

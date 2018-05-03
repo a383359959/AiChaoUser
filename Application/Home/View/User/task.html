@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>我的任务</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/countdown.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			$(document).on('click','.task_info',function(){
+				var obj = $(this).parent().parent();
+				var css = obj.find('.order_list_h3').css('display');
+				if(css == 'none'){
+					obj.find('.order_list_h3').slideDown();
+				}else{
+					obj.find('.order_list_h3').slideUp();
+				}
+			});
+			$(document).on('click','.task_del',function(){
+				var obj = $(this).parent().parent();
+				$.ajax({
+					url : '{:U("task_del")}',
+					data : {
+						id : $(this).attr('data_id')
+					},
+					dataType : 'json',
+					success : function(result){
+						if(result.status == 'success'){
+							alert('删除成功！');
+							obj.remove();
+						}
+					}
+				});
+			});
+			$(document).on('click','.jiedan',function(){
+				var order_id = $(this).attr('order_id');
+				$.ajax({
+					url : '{:U("setTask")}',
+					data : {
+						order_id : order_id
+					},
+					dataType : 'json',
+					success : function(result){
+						if(result.status == 'success') window.location.href = window.location.href;
+					}
+				});
+			});
+			var page = 0;			
+			loadData();
+			function loadData(){
+				$('.order_list ul').html('');
+				$('.dropload-down').remove();
+				$('.order_list').dropload({
+					scrollArea : window,
+					loadDownFn : function(me){
+						page++;
+						$.ajax({
+							url : '{:U("tasklist")}',
+							data : {
+								page : page
+							},
+							dataType : 'json',
+							success : function(result){
+								if(result.list.length > 0){
+									var list = template('list',result);
+									$('.order_list ul').append(list);
+								}else{
+									me.lock();
+									me.noData();
+								}
+								me.resetload();
+							}
+						});
+					}
+				});
+			}
+		});
+		</script>
+	</head>
+	<body>
+		<header><i class="back"></i>我的任务</header>
+		<div class="order_list">
+			<ul></ul>
+			<script id="list" type="text/html">
+			{{each list as value key}}
+			<li last_time="{{value.last_time}}">
+				<div class="order_list_h1">
+					<span>{{value.store_name}}</span>
+					<span style="float:right;color:#f8d101;">{{value.pei_status}}</span>
+					<div class="clear"></div>
+				</div>
+				<div class="order_list_h2">
+					<img src="{{value.logo}}" />
+					<div class="order_list_info">
+						<h1>￥{{value.order_price}}</h1>
+						<p>{{value.add_time}}</p>
+						<p>{{value.contact_address}}</p>
+					</div>
+					<a href="javascript:;" class="task_info">查看</a>
+					<a href="javascript:;" class="task_del" data_id="{{value.id}}" style="right:70px;">删除</a>
+				</div>
+				<div class="order_list_h3">
+					<h1>订单编号：{{value.order_sn}}</h1>
+					<h1>店铺地址：{{value.store_address}}</h1>
+					<h1>姓名：{{value.contact_name}}</h1>
+					<h1>电话：{{value.contact_telephone}}</h1>
+					<h1>备注：{{value.note}}</h1>
+					<h1>商品列表</h1>
+					{{#value.goods}}
+				</div>
+			</li>
+			{{/each}}
+			</script>
+		</div>
+	</body>
+</html>

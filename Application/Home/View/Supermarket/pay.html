@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>支付订单</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+	</head>
+	<body>
+		<header><i class="back"></i>支付订单</header>
+		<div class="order_pay">
+			<p>店铺名称：{$store.store_name}</p>
+			<p>订单金额：￥{$price}</p>
+			<p>支付方式：微信支付</p>
+			<a href="javascript:;">确认支付</a>
+		</div>
+		<script>
+		$(function(){
+			$('.order_pay a').bind('click',function(){
+				WeixinJSBridge.invoke('getBrandWCPayRequest',{$wxpay},function(res){
+					if(res.err_msg == 'get_brand_wcpay_request:ok'){
+						window.location.href = '{:U("Order/index")}';
+					}
+				});
+			});
+		});
+		</script>
+	</body>
+</html>

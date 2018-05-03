@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>个人中心</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+	</head>
+	<body>
+		<div class="user_info_header">
+			<img src="{$user.user_info.headimgurl}" class="headimgurl" />
+			<p style="font-size:18px;">{:base64_decode($user['user_info']['nickname'])}</p>
+			<ul>
+				<li>
+					<img src="__PUBLIC__/Home/images/userico1.png" />
+					<span>余额 {$user.money}元</span>
+				</li>
+				<li>
+					<img src="__PUBLIC__/Home/images/userico2.png" />
+					<span>积分 0.00</span>
+				</li>
+				<li>
+					<img src="__PUBLIC__/Home/images/userico3.png" />
+					<span>优惠券</span>
+				</li>
+				<li>
+					<img src="__PUBLIC__/Home/images/userico4.png" />
+					<span>二维码</span>
+				</li>
+				<div class="clear"></div>
+			</ul>
+		</div>
+		<div class="user_info_item">
+			<ul>
+				<li><a href="{:U('address')}">我的地址</a></li>
+				<!-- <li><a href="{:U('task')}">我的任务</a></li> -->
+				<li><a href="{:U('Order/index')}">我的订单</a></li>
+				<li><a href="{:U('tixian')}">提现</a></li>
+			</ul>
+		</div>
+		<include file="Common:footer" />
+	</body>
+</html>

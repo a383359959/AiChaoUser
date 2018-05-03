@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>购物车</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/common.js"></script>
+	</head>
+	<body>
+		<header><i class="back"></i>购物车</header>
+		<form action="{:U('Store/pay')}" method="post">
+		<if condition="$address">
+		<input type="hidden" name="contact_name" value="{$address.name}" />
+		<input type="hidden" name="contact_telephone" value="{$address.telephone}" />
+		<input type="hidden" name="contact_address" value="{$address.address}" />
+		<input type="hidden" name="store_id" value="{$Think.get.store_id}" />
+		<input type="hidden" name="pei_time" value="" />
+		<input type="hidden" name="pei_type" value="兼职配送" />
+		<!-- 优惠信息 -->
+		<input type="hidden" name="is_youhui" value="{$store.is_youhui}" />
+		<input type="hidden" name="man" value="{$store.man}" />
+		<input type="hidden" name="jian" value="{$store.jian}" />
+		<div class="checkout_address">
+			<a href="{:U('User/address')}">
+				<p>{$address.name}&nbsp;&nbsp;{$address.telephone}</p>
+				<p>{$address.address}</p>
+			</a>
+		</div>
+		<else />
+		<div class="checkout_address" data_status="0">
+			<a href="{:U('User/address')}">
+				<p>请添加地址</p>
+			</a>
+		</div>
+		</if>
+		<div class="checkout_pei_time peisongshijian">
+			<label>配送时间</label>
+			<p></p>
+			<div class="clear"></div>
+		</div>
+		<if condition="$store['category_id'] == 2">
+		<div class="checkout_pei_time peisongfangshi">
+			<label>配送方式</label>
+			<p>兼职配送</p>
+			<div class="clear"></div>
+		</div>
+		<div class="checkout_pei_time dashangjine">
+			<label>打赏金额</label>
+			<p><input type="text" placeholder="请输入打赏金额" style="width:100px;" /></p>
+			<div class="clear"></div>
+		</div>
+		</if>
+		<div class="checkout_pei_note">
+			<textarea placeholder="添加备注" name="note"></textarea>
+		</div>
+		<div class="checkout_youhui">
+			<ul>
+				<li>
+					<label>优惠券</label>
+					<p>0</p>
+					<i></i>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>积分</label>
+					<p>0</p>
+					<i></i>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>商铺名称</label>
+					<div class="clear"></div>
+				</li>
+			</ul>
+		</div>
+		<div class="checkout_goods">{$cart}</div>
+		<a href="javascript:;" class="checkout_submit">提交</a>
+		<div class="pei_time_select pssj">
+			<h1>配送时间<a href="javascript:;">关闭</a></h1>
+			<ul>{$pei_time}</ul>
+		</div>
+		<div class="pei_time_select psfs">
+			<h1>配送方式<a href="javascript:;">关闭</a></h1>
+			<ul>
+				<li><a href="javascript:;">商家配送</a></li>
+				<li><a href="javascript:;">兼职配送</a></li>
+			</ul>
+		</div>
+		</form>
+		<script>
+		$(function(){
+			$(function(){
+				$('.checkout_submit').bind('click',function(){
+					var checkout_address = $('.checkout_address').attr('data_status');
+					var pei_time = $('input[name="pei_time"]').val();
+					if(checkout_address == 0){
+						window.location.href = '{:U("User/address_add",array("act" => "checkout","store_id" => $_REQUEST["store_id"]))}';
+					}else if(pei_time == ''){
+						alert('请选择配送时间');
+					}else{
+						$.ajax({
+							url : '{:U("checkCart")}',
+							data : {
+								store_id : {$Think.get.store_id}
+							},
+							success : function(result){
+								if(result > 0){
+									$('form').submit();
+								}else{
+									alert('购物车不能为空');
+									window.location.href = '{:U("Store/index",array("id" => $_REQUEST["store_id"]))}';
+								}
+							}
+						});
+					}
+				});
+			});
+		});
+		</script>
+	</body>
+</html>

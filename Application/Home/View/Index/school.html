@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>选择学校</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+	</head>
+	<body>
+		<header>速校救星</header>
+		<div class="index">
+			<p>选择附近学校</p>
+			<ul>
+				<foreach name="list" item="value">
+				<li><a href="{:U('school',array('id' => $value['id']))}">{$value.name}</a></li>
+				</foreach>
+			</ul>
+		</div>
+	</body>
+</html>

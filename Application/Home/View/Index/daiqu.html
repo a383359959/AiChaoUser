@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>代取快递</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/style.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/swiper.min.css" />
+		<link rel="stylesheet" href="__PUBLIC__/Home/css/dropload.css" />
+		<script type="text/javascript" src="__PUBLIC__/Home/js/jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/swiper.jquery.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/dropload.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/Home/js/template.js"></script>
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=b22ce3edc747426f486b6004021c50be"></script>
+		<script type="text/javascript">
+		$(function(){
+			var map, geolocation;
+			var lng = '';
+			var lat = '';
+			map = new AMap.Map('map',{
+				resizeEnable: true
+			});
+			map.plugin('AMap.Geolocation', function() {
+				geolocation = new AMap.Geolocation({
+					enableHighAccuracy : true,
+					timeout : 10000,
+					buttonOffset : new AMap.Pixel(10, 20),
+					zoomToAccuracy : true,
+					buttonPosition :'RB'
+				});
+				geolocation.getCurrentPosition();
+				AMap.event.addListener(geolocation,'complete',function(data){
+					lng = data.position.getLng();
+					lat = data.position.getLat();
+				});
+				AMap.event.addListener(geolocation,'error',onError);
+			});
+			$('.qkd_btn').bind('click',function(){
+				if(lng == '' || lat == ''){
+					alert('定位中，请稍后再试');
+					return false;
+				}
+				var type = $('select[name="type"]').val();
+				var weight = $('.qkd select[name="weight"]').val();
+				var express_number = $('.qkd input[name="express_number"]').val();
+				var express_name = $('.qkd input[name="express_name"]').val();
+				var id_card = $('.qkd input[name="id_card"]').val();
+				var name = $('.qkd input[name="name"]').val();
+				var telephone = $('.qkd input[name="telephone"]').val();
+				var school_address_id = $('.qkd select[name="school_address_id"]').val();
+				var address = $('.qkd input[name="address"]').val();
+				if(weight == 0){
+					alert('请选择重量！');
+				}else if(express_number == ''){
+					alert('快递单号不能为空！');
+				}else if(express_name == ''){
+					alert('快递名称不能为空！');
+				}else if(id_card == ''){
+					alert('身份证号不能为空！');
+				}else if(id_card.length != 18){
+					alert('身份证号不正确！');
+				}else if(name == ''){
+					alert('姓名不能为空！');
+				}else if(telephone == ''){
+					alert('电话不能为空！');
+				}else if(telephone.length != 11){
+					alert('电话格式错误！');
+				}else if(school_address_id == 0 || address == ''){
+					alert('请完善地址！');
+				}else{
+					$.ajax({
+						url : '{:U("setKuaiDi")}',
+						data : {
+							express_number : express_number,
+							express_name : express_name,
+							id_card : id_card,
+							name : name,
+							telephone : telephone,
+							school_address_id : school_address_id,
+							address : address,
+							type : type,
+							weight : weight,
+							lng : lng,
+							lat : lat
+						},
+						dataType : 'json',
+						success : function(result){
+							WeixinJSBridge.invoke('getBrandWCPayRequest',result,function(res){
+								if(res.err_msg == 'get_brand_wcpay_request:ok'){
+									window.location.href = '{:U("Order/index")}';
+								}
+							});
+						}
+					});
+				}
+			});
+			$('.fkd_btn').bind('click',function(){
+				if(lng == '' || lat == ''){
+					alert('定位中，请稍后再试');
+					return false;
+				}
+				var type = $('select[name="type"]').val();
+				var weight = $('.fkd select[name="weight"]').val();
+				var sender_name = $('.fkd input[name="sender_name"]').val();
+				var sender_telephone = $('.fkd input[name="sender_telephone"]').val();
+				var school_address_id = $('.fkd select[name="school_address_id"]').val();
+				var address = $('.fkd input[name="address"]').val();
+				var recipient_name = $('.fkd input[name="recipient_name"]').val();
+				var recipient_telephone = $('.fkd input[name="recipient_telephone"]').val();
+				var recipient_address = $('.fkd input[name="recipient_address"]').val();
+				if(weight == 0){
+					alert('请选择重量！');
+				}else if(sender_name == ''){
+					alert('寄件人姓名不能为空！');
+				}else if(sender_telephone == ''){
+					alert('寄件人电话不能为空！');
+				}else if(sender_telephone.length != 11){
+					alert('寄件人电话格式错误！');
+				}else if(school_address_id == 0 || address == ''){
+					alert('请完善寄件人地址！');
+				}else if(recipient_name == ''){
+					alert('收件人姓名不能为空！');
+				}else if(recipient_telephone == ''){
+					alert('收件人电话不能为空！');
+				}else if(recipient_telephone == ''){
+					alert('收件人电话格式错误！');
+				}else if(recipient_address == ''){
+					alert('收件人地址不能为空！');
+				}else{
+					$.ajax({
+						url : '{:U("setKuaiDi")}',
+						data : {
+							sender_name : sender_name,
+							sender_telephone : sender_telephone,
+							school_address_id : school_address_id,
+							address : address,
+							recipient_name : recipient_name,
+							recipient_telephone : recipient_telephone,
+							recipient_address : recipient_address,
+							type : type,
+							weight : weight,
+							lng : lng,
+							lat : lat
+						},
+						dataType : 'json',
+						success : function(result){
+							WeixinJSBridge.invoke('getBrandWCPayRequest',result,function(res){
+								if(res.err_msg == 'get_brand_wcpay_request:ok'){
+									window.location.href = '{:U("Order/index")}';
+								}
+							});
+						}
+					});
+				}
+			});
+			$('select[name="type"]').bind('change',function(){
+				var value = $(this).val();
+				if(value == 1){
+					$('.qkd').show();
+					$('.fkd').hide();
+				}else{
+					$('.qkd').hide();
+					$('.fkd').show();
+				}
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<div id="map" style="display:none;"></div>
+		<header><i class="back"></i>代取快递</header>
+		<div class="xiyi">
+			<ul>
+				<li>
+					<label>类型</label>
+					<select name="type">
+						<option value="0">请选择</option>
+						<option value="1">取快递</option>
+						<option value="2">发快递</option>
+					</select>
+					<div class="clear"></div>
+				</li>
+			</ul>
+		</div>
+		<div class="qkd xiyi" style="margin-top:0px;display:none;">
+			<ul>
+				<li>
+					<label>重量</label>
+					<select name="weight">
+						<option value="0">请选择</option>
+						<option value="1">小件</option>
+						<option value="2">大件</option>
+					</select>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>快递单号</label>
+					<input type="text" name="express_number" placeholder="请输入快递单号" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>快递名称</label>
+					<input type="text" name="express_name" placeholder="请输入快递名称" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>身份证号</label>
+					<input type="text" name="id_card" placeholder="请输入身份证号" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>姓名</label>
+					<input type="text" name="name" placeholder="请输入姓名" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>电话</label>
+					<input type="tel" name="telephone" placeholder="请输入电话" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>地址</label>
+					<input type="text" disabled value="{$school.name}" />
+					<div class="clear"></div>
+					<div class="xiyi_address">
+						<select name="school_address_id">
+							<option value="0">请选择</option>
+							<volist name="school_address" id="value">
+							<option value="{$value.id}">{$value.name}</option>
+							</volist>
+						</select>
+						<input type="text" name="address" placeholder="请输入详细地址" />
+						<div class="clear"></div>
+					</div>
+					<div class="clear"></div>
+				</li>
+			</ul>
+			<a href="javascript:;" class="checkout_submit qkd_btn">支付</a>
+		</div>
+		<div class="fkd xiyi" style="margin-top:0px;display:none;">
+			<ul>
+				<li>
+					<label>重量</label>
+					<select name="weight">
+						<option value="0">请选择</option>
+						<option value="1">小件</option>
+						<option value="2">大件</option>
+					</select>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>寄件人姓名</label>
+					<input type="text" name="sender_name" placeholder="请输入寄件人姓名" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>寄件人电话</label>
+					<input type="tel" name="sender_telephone" placeholder="请输入寄件人电话" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>寄件人地址</label>
+					<input type="text" disabled value="{$school.name}" />
+					<div class="clear"></div>
+					<div class="xiyi_address">
+						<select name="school_address_id">
+							<option value="0">请选择</option>
+							<volist name="school_address" id="value">
+							<option value="{$value.id}">{$value.name}</option>
+							</volist>
+						</select>
+						<input type="text" name="address" placeholder="请输入详细地址" />
+						<div class="clear"></div>
+					</div>
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>收件人姓名</label>
+					<input type="text" name="recipient_name" placeholder="请输入收件人姓名" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>收件人电话</label>
+					<input type="tel" name="recipient_telephone" placeholder="请输入收件人电话" />
+					<div class="clear"></div>
+				</li>
+				<li>
+					<label>收件人地址</label>
+					<div class="clear"></div>
+					<input type="text" style="float:none;width:calc(100% - 20px);" name="recipient_address" placeholder="请输入收件人地址" />
+					<div class="clear"></div>
+				</li>
+			</ul>
+			<a href="javascript:;" class="checkout_submit fkd_btn">支付</a>
+		</div>
+	</body>
+</html>
